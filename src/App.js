@@ -3,6 +3,7 @@ import './App.css';
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import { sources, fetch_from } from './Source.js';
+import { CSVLink } from "react-csv";
 
 // a source entry is { type: <type>, key: <key> }
 const isEntryEqual = (e1,e2) => e1.type == e2.type && e1.key == e2.key;
@@ -153,10 +154,16 @@ const resultsKey = "results";
 function Stats({results}) {
     const total = results.reduce((acc,row) => acc + row.usd,0);
 
-        return (
+    return (
        <div>
-            You got {total.toFixed(2)} dollars in there !
+            <div className="row">
+                You got {total.toFixed(2)} dollars in there !
+            </div>
+            <div className="row">
+                <CSVLink data={results}>Download CSV results</CSVLink>;   
+            </div>
         </div>
+
     );
 }
 

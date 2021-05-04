@@ -1,5 +1,6 @@
 const sources = [
   { label: "Yieldwatch (BSC)", method: fetch_yieldwatch },
+  { label: "Filfox (FIL)", method: fetch_fil },
   { label: "Kraken", value:  nop },
   { label: "Binance", value: nop  }
 ];
@@ -57,6 +58,28 @@ async function fetch_yieldwatch(key) {
     return Object.entries(platforms).map(([plat, fetches]) => {
         return fetches.map(f => f(plat)).flat()
     }).flat()
+}
+
+async function fetch_fil(key) {
+    const resp = await fetch(`https://filfox.info/api/v1/address/${key}`);
+    const json = await resp.json();
+    if (json["statusCode"]) {
+        throw "Invalid FIL request";
+    }
+    const balance = json["balance"] / Math.pow(10,18);
+    const price = await get_price_usd("filecoin");
+    return {
+        plat: "FIL",
+        token: "FIL",
+        usd: balance * price,
+    };
+}
+
+async function get_price_usd(symbol) {
+    const req = await fetch(`https://api.coingecko.com/api/v3/coins/${symbol}?tickers=true&community_data=false&developer_data=false&sparkline=false`, 
+        { headers: { accept : "application/json" }});
+    const json = await req.json();
+    return json["market_data"]["current_price"]["usd"];
 }
 
 async function nop() {
