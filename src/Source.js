@@ -5,6 +5,14 @@ const sources = [
   { label: "Binance", value: nop  }
 ];
 
+const newRow = (plat,token,usd)  => { 
+    return {
+        platform: plat.toLowerCase(),
+        token:token.toLowerCase(),
+        usd:usd
+    }; 
+};
+
 async function fetch_from(entry) {
     const source = sources.find(e => e.label == entry.type);
     if (source == undefined) {
@@ -31,12 +39,8 @@ async function fetch_yieldwatch(key) {
             const current_tokens = item["currentTokens"];
             const pending_rewards = item["pendingRewards"];
             const total = deposit_usd * current_tokens + reward_usd * pending_rewards;
-            return { 
-                platform: plat, 
-                token: item["depositToken"].toLowerCase(), 
-                usd: total 
-            };
-            });
+            return newRow(plat, item["depositToken"], total);
+        });
     };
     const fetch_stake = (plat) => {
         return results[plat]["staking"]["vaults"].map(item => {
@@ -44,11 +48,7 @@ async function fetch_yieldwatch(key) {
             const deposited = item["depositedTokens"]
             const pending = item["pendingRewards"]
             const total = usd_price * (deposited + pending)
-            return {
-                platform: plat,
-                token: item["depositToken"],
-                usd: total
-            };
+            return newRow(plat, item["depositToken"], total);
         });
     };
     const platforms = { // TODO more
@@ -68,11 +68,7 @@ async function fetch_fil(key) {
     }
     const balance = json["balance"] / Math.pow(10,18);
     const price = await get_price_usd("filecoin");
-    return {
-        plat: "FIL",
-        token: "FIL",
-        usd: balance * price,
-    };
+    return newRow("FIL", "FIL", balance * price);
 }
 
 async function get_price_usd(symbol) {
