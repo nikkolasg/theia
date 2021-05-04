@@ -148,9 +148,12 @@ function Config({newConfigCallback}) {
     );
 }
 
+const resultsKey = "results";
+
 function Stats({results}) {
     const total = results.reduce((acc,row) => acc + row.usd,0);
-    return (
+
+        return (
        <div>
             You got {total.toFixed(2)} dollars in there !
         </div>
@@ -163,6 +166,21 @@ function asyncMap(arr, fn) {
 
 function App() {
     const [results,setResults] = useState([]);
+
+    useEffect(() => {
+        const json = localStorage.getItem(resultsKey);
+        const savedResults = JSON.parse(json);
+        if (savedResults) {
+            setResults(savedResults)
+        }
+    },[]);
+
+    useEffect(() => {
+        const json = JSON.stringify(results);
+        localStorage.setItem(resultsKey,json);
+    },[results]);
+
+
     const newConfig = (entries) => {
         console.log("NEW ENTRIES SETUP: ",entries);
         const fetchAndProcess = async (all) => {
