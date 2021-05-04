@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import { sources, fetch_from } from './Source.js';
 
@@ -73,14 +73,32 @@ function Source({entry,onSubmit,onDelete}) {
     );
 }
 
+const entriesKey = "sources";
+
 function Config({newConfigCallback}) {
     // contains the list of entries with always an empty entry
     const [entries,setEntries] = useState([]);
 
+    useEffect(() => {
+        // load entries only at the beginning
+        const json = localStorage.getItem(entriesKey);
+        const savedEntries = JSON.parse(json);
+        if (savedEntries) {
+            console.log("LOADED entries from storage ",savedEntries);
+            setEntries(savedEntries);
+        }
+    },[]);
+
+    useEffect(() => {
+        const json = JSON.stringify(entries);
+        localStorage.setItem(entriesKey,json);
+        newConfigCallback(entries); 
+        console.log("SAVED entries to storage", entries);
+    },[entries])
+
     const updateAndSend = () => {
         const newEntries = [...entries];
         setEntries(newEntries);
-        newConfigCallback(newEntries); 
     };
         
     const submitEntry = (old,newEntry) => {

@@ -20,7 +20,7 @@ async function fetch_yieldwatch(key) {
     const resp = await fetch(`https://www.yieldwatch.net/api/all/${key}?platforms=${params}`);
     const json = await resp.json();
     if (json.status == "0") {
-        throw "Invalid request (maybe invalid address?)";
+        throw "Invalid request (maybe invalid address?";
     }
     const results = json["result"]; 
     const fetch_vault = (plat) => {
@@ -63,6 +63,9 @@ async function nop() {
     console.log("NOT IMPLEMENTED YET");
     return [];
 }
-
-exports.sources = sources;
-exports.fetch_from = fetch_from;
+export {
+    sources,
+    fetch_from,
+}
+//exports.sources = sources;
+//exports.fetch_from = fetch_from;
