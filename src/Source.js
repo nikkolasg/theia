@@ -14,10 +14,9 @@ const newRow = (plat,token,usd)  => {
 };
 
 async function fetch_from(entry) {
-    const source = sources.find(e => e.label == entry.type);
-    if (source == undefined) {
-        console.log("ERROR FETCH FROM UNDEFINED ",entry);
-        throw "Error undefined source";
+    const source = sources.find(e => e.label === entry.type);
+    if (source === undefined) {
+        throw new Error("Error undefined source", entry);
     }
     return await source.method(entry.key);
 }
@@ -28,8 +27,8 @@ async function fetch_yieldwatch(key) {
     const params = platforms_url.join(",");
     const resp = await fetch(`https://www.yieldwatch.net/api/all/${key}?platforms=${params}`);
     const json = await resp.json();
-    if (json.status == "0") {
-        throw "Invalid request (maybe invalid address?";
+    if (json.status === "0") {
+        throw new Error("Invalid request (maybe invalid address?");
     }
     const results = json["result"]; 
     const fetch_vault = (plat) => {
@@ -64,7 +63,7 @@ async function fetch_fil(key) {
     const resp = await fetch(`https://filfox.info/api/v1/address/${key}`);
     const json = await resp.json();
     if (json["statusCode"]) {
-        throw "Invalid FIL request";
+        throw new Error("Invalid FIL request");
     }
     const balance = json["balance"] / Math.pow(10,18);
     const price = await get_price_usd("filecoin");

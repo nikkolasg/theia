@@ -1,58 +1,60 @@
-import logo from './logo.svg';
 import './App.css';
 import React, { useState, useEffect } from 'react';
-import Select from 'react-select';
 import { sources, fetch_from } from './Source.js';
 import { CSVLink } from "react-csv";
 
 // a source entry is { type: <type>, key: <key> }
-const isEntryEqual = (e1,e2) => e1.type == e2.type && e1.key == e2.key;
+const isEntryEqual = (e1,e2) => e1.type === e2.type && e1.key === e2.key;
 const newEntry = (t,k) => { return { type: t, key: k }; };
 const emptyEntry = newEntry("","");
 
 function Source({entry,onSubmit,onDelete}) {
-    const defaultType = () => {
-        if (entry == undefined || entry.type == "") {
-            console.log("DEFAULT VALUE EMPTY ",entry," => replace by ",sources[0].label);
-            return sources[0].label;
-        } else {
-            return entry.type;
-        }
+    const defaultEntry = () => {
+        var e = {...entry};
+        if (entry === undefined || entry.type === "") {
+            e.type = sources[0].label;
+        } 
+        return e;
     }
-    const [type,setType] = useState(defaultType());
-    const [key,setKey] = useState(entry.key);
-
-    const getEntry = () => newEntry(type,key);
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const newEntry = getEntry();
-        console.log("OLD ENTRY ",entry," => NEW ENTRY (type",type,") : ",newEntry);
-        onSubmit(entry,newEntry);
-        setType("");
-        setKey("");
+    const [local,setLocal] = useState(defaultEntry());
+    const changeType = (t) => {
+        local.type = t;
+        setLocal({...local});
+    };
+    const changeKey = (k) => {
+        local.key = k;
+        setLocal({...local});
     };
 
-    console.log("NEW RENDER : type",type, defaultType(), entry);
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const newEntry = local;
+        console.log("OLD ENTRY ",entry," => NEW ENTRY (type",entry.type,") : ",newEntry);
+        onSubmit(entry,newEntry);
+        setLocal(newEntry("",""));
+    };
+
+    console.log("NEW RENDER : type",local.type);
     const buttonText = isEntryEqual(entry,emptyEntry) ? "Add Source" : "Update";
     //const optionsDict = sources.map(e => {e.type: e.type.toUpperCase() });
 
     return (
         <div className='row'>
-            <form className= "form-inline well" role="form" onSubmit={handleSubmit}>
+            <form className= "form-inline well" onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label  className="col-md-1">Source</label>
                     <select className="form-control col-md-3" 
-                            value={type} 
+                            value={local.type} 
                             defaultValue={sources[0].label}
-                            onChange={e => setType(e.target.value)}>
+                            onChange={e => changeType(e.target.value)}>
                         { sources.map(s => 
                             <option value={s.label}> 
                                 {s.label.toUpperCase()} 
                             </option>) }
                     </select>
                     <input
-                      value={key}
-                      onChange={e => setKey(e.target.value)}
+                      value={local.key}
+                      onChange={e => changeKey(e.target.value)}
                       type='text'
                       size="50"
                       className='form-control col-md-5 col-md-offset-4'
@@ -63,7 +65,10 @@ function Source({entry,onSubmit,onDelete}) {
                         {buttonText}
                     </button>
                     <button type="button" 
-                        onClick={() => onDelete(getEntry())}    
+                        // we pass the entry we've been given as this how the
+                        // config  looks up for the index to remove in the list
+                        // TODO : maybe give an ID to each entry ?
+                        onClick={() => onDelete(entry)}    
                         className="close col-md-1" 
                         aria-label="Delete">
                       <span aria-hidden="true">&times;</span>
@@ -104,7 +109,7 @@ function Config({newConfigCallback}) {
         
     const submitEntry = (old,newEntry) => {
         let idx = entries.findIndex(e => isEntryEqual(old,e));
-        if (idx != -1) { // entry is being updated
+        if (idx !== -1) { // entry is being updated
             entries[idx] = newEntry;
         } else { // entry is being created for the first time
             entries.push(newEntry);
@@ -116,7 +121,7 @@ function Config({newConfigCallback}) {
     const deleteEntry = (entry) => {
         console.log("DELETE ENTRY ",entry," ON ",entries);
         let idx = entries.findIndex(e => isEntryEqual(entry,e));
-        if (idx == -1) {
+        if (idx === -1) {
             // silent return because the entry is the empty one
             return; 
         }
@@ -124,9 +129,16 @@ function Config({newConfigCallback}) {
         console.log("DELETE ENTRY NEW STATE",entries);
         updateAndSend();
     }
+
+    const deleteConfig = () => localStorage.removeItem(entriesKey);
+
     console.log("ENTRIES SIZE: ",entries.length, " ==> ",entries);
     return (
         <div className="Config"> 
+        <div className="row">
+            <button className="btc btn-danger" Click={deleteConfig}> Delete Config </button>
+        </div>
+        <div className="row">
         {
             entries.map(e => 
                 <Source 
@@ -145,6 +157,7 @@ function Config({newConfigCallback}) {
                 onDelete={deleteEntry}
             />
         }
+        </div>
         </div>
     );
 }
@@ -186,7 +199,6 @@ function App() {
         const json = JSON.stringify(results);
         localStorage.setItem(resultsKey,json);
     },[results]);
-
 
     const newConfig = (entries) => {
         console.log("NEW ENTRIES SETUP: ",entries);
