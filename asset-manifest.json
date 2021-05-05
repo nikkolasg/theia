@@ -1,26 +1,25 @@
 {
   "files": {
     "main.css": "/theia/static/css/main.c4f9af84.chunk.css",
-    "main.js": "/theia/static/js/main.37ee1028.chunk.js",
-    "main.js.map": "/theia/static/js/main.37ee1028.chunk.js.map",
+    "main.js": "/theia/static/js/main.cf31c042.chunk.js",
+    "main.js.map": "/theia/static/js/main.cf31c042.chunk.js.map",
     "runtime-main.js": "/theia/static/js/runtime-main.f0168e87.js",
     "runtime-main.js.map": "/theia/static/js/runtime-main.f0168e87.js.map",
     "static/css/2.658248ec.chunk.css": "/theia/static/css/2.658248ec.chunk.css",
-    "static/js/2.7593cd0e.chunk.js": "/theia/static/js/2.7593cd0e.chunk.js",
-    "static/js/2.7593cd0e.chunk.js.map": "/theia/static/js/2.7593cd0e.chunk.js.map",
+    "static/js/2.49ae04d4.chunk.js": "/theia/static/js/2.49ae04d4.chunk.js",
+    "static/js/2.49ae04d4.chunk.js.map": "/theia/static/js/2.49ae04d4.chunk.js.map",
     "static/js/3.30d37578.chunk.js": "/theia/static/js/3.30d37578.chunk.js",
     "static/js/3.30d37578.chunk.js.map": "/theia/static/js/3.30d37578.chunk.js.map",
     "index.html": "/theia/index.html",
     "static/css/2.658248ec.chunk.css.map": "/theia/static/css/2.658248ec.chunk.css.map",
     "static/css/main.c4f9af84.chunk.css.map": "/theia/static/css/main.c4f9af84.chunk.css.map",
-    "static/js/2.7593cd0e.chunk.js.LICENSE.txt": "/theia/static/js/2.7593cd0e.chunk.js.LICENSE.txt",
-    "static/media/logo.6ce24c58.svg": "/theia/static/media/logo.6ce24c58.svg"
+    "static/js/2.49ae04d4.chunk.js.LICENSE.txt": "/theia/static/js/2.49ae04d4.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.f0168e87.js",
     "static/css/2.658248ec.chunk.css",
-    "static/js/2.7593cd0e.chunk.js",
+    "static/js/2.49ae04d4.chunk.js",
     "static/css/main.c4f9af84.chunk.css",
-    "static/js/main.37ee1028.chunk.js"
+    "static/js/main.cf31c042.chunk.js"
   ]
 }
