@@ -8,6 +8,24 @@ const isEntryEqual = (e1,e2) => e1.type === e2.type && e1.key === e2.key;
 const newEntry = (t,k) => { return { type: t, key: k }; };
 const emptyEntry = newEntry("","");
 
+const SelectList = ({entry,onChange}) => {
+    return (
+    <>
+        <label  className="col-md-1">Source</label>
+        <select className="form-control col-md-3" 
+            value={entry.type} 
+            defaultValue={sources[0].label}
+            onChange={e => onChange(e.target.value)}>
+            { sources.map(s => 
+            <option value={s.label}> 
+                {s.label.toUpperCase()} 
+            </option>) }
+        </select>
+    </>
+    );
+
+};
+
 function Source({entry,onSubmit,onDelete}) {
     const defaultEntry = () => {
         var e = {...entry};
@@ -42,16 +60,7 @@ function Source({entry,onSubmit,onDelete}) {
         <div className='row'>
             <form className= "form-inline well" onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label  className="col-md-1">Source</label>
-                    <select className="form-control col-md-3" 
-                            value={local.type} 
-                            defaultValue={sources[0].label}
-                            onChange={e => changeType(e.target.value)}>
-                        { sources.map(s => 
-                            <option value={s.label}> 
-                                {s.label.toUpperCase()} 
-                            </option>) }
-                    </select>
+                    <SelectList entry={local} onChange={changeType} />
                     <input
                       value={local.key}
                       onChange={e => changeKey(e.target.value)}
