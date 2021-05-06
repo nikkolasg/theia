@@ -1,80 +1,28 @@
+import { fetch_fil, inputs_fil } from "./sources/Fil.js";
+import { fetch_yieldwatch, inputs_yieldwatch } from "./sources/Yieldwatch.js";
+
 const sources = [
-  { label: "Yieldwatch (BSC)", method: fetch_yieldwatch },
-  { label: "Filfox (FIL)", method: fetch_fil },
-  { label: "Kraken", value:  nop },
-  { label: "Binance", value: nop  }
+  { 
+        label: "Yieldwatch (BSC)", 
+        fetch: fetch_yieldwatch,
+        inputs: inputs_yieldwatch,
+  },
+  { 
+      label: "Filfox (FIL)", 
+      fetch: fetch_fil,
+      inputs: inputs_fil,
+  },
+  { label: "Kraken", fetch:  nop },
+  { label: "Binance", fetch: nop  }
 ];
 
-const newRow = (plat,token,usd)  => { 
-    return {
-        platform: plat.toLowerCase(),
-        token:token.toLowerCase(),
-        usd:usd
-    }; 
-};
-
 async function fetch_from(entry) {
+    console.log("\t FETCH FROM called on: ",entry);
     const source = sources.find(e => e.label === entry.type);
     if (source === undefined) {
         throw new Error("Error undefined source", entry);
     }
-    return await source.method(entry.key);
-}
-
-async function fetch_yieldwatch(key) {
-    console.log("YieldWatch fetching"); 
-    const platforms_url = ["beefy","pancake","auto","bunny"];
-    const params = platforms_url.join(",");
-    const resp = await fetch(`https://www.yieldwatch.net/api/all/${key}?platforms=${params}`);
-    const json = await resp.json();
-    if (json.status === "0") {
-        throw new Error("Invalid request (maybe invalid address?");
-    }
-    const results = json["result"]; 
-    const fetch_vault = (plat) => {
-        return results[plat]["vaults"]["vaults"].map(item => {
-            const deposit_usd = item["priceInUSDDepositToken"];
-            const reward_usd = item["priceInUSDRewardToken"];
-            const current_tokens = item["currentTokens"];
-            const pending_rewards = item["pendingRewards"];
-            const total = deposit_usd * current_tokens + reward_usd * pending_rewards;
-            return newRow(plat, item["depositToken"], total);
-        });
-    };
-    const fetch_stake = (plat) => {
-        return results[plat]["staking"]["vaults"].map(item => {
-            const usd_price = item["priceInUSDDepositToken"]
-            const deposited = item["depositedTokens"]
-            const pending = item["pendingRewards"]
-            const total = usd_price * (deposited + pending)
-            return newRow(plat, item["depositToken"], total);
-        });
-    };
-    const platforms = { // TODO more
-        "bunny": [fetch_vault,fetch_stake],
-        "Autofarm": [fetch_vault]
-    }; 
-    return Object.entries(platforms).map(([plat, fetches]) => {
-        return fetches.map(f => f(plat)).flat()
-    }).flat()
-}
-
-async function fetch_fil(key) {
-    const resp = await fetch(`https://filfox.info/api/v1/address/${key}`);
-    const json = await resp.json();
-    if (json["statusCode"]) {
-        throw new Error("Invalid FIL request");
-    }
-    const balance = json["balance"] / Math.pow(10,18);
-    const price = await get_price_usd("filecoin");
-    return newRow("FIL", "FIL", balance * price);
-}
-
-async function get_price_usd(symbol) {
-    const req = await fetch(`https://api.coingecko.com/api/v3/coins/${symbol}?tickers=true&community_data=false&developer_data=false&sparkline=false`, 
-        { headers: { accept : "application/json" }});
-    const json = await req.json();
-    return json["market_data"]["current_price"]["usd"];
+    return await source.fetch(entry.key);
 }
 
 async function nop() {
